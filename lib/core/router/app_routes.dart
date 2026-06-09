@@ -19,6 +19,12 @@ class AppRoutes {
   static const String forgotPassword = 'forgot-password';
   static const String verifyOtp = 'verify-otp';
   static const String resetPassword = 'reset-password';
+  static const String verifySuccess = 'verify-success';
+  static const String accountVerification = 'account-verification';
+  static const String returnAccountVerification = 'return-account-verification';
+
+
+
 
   // ─── Main names ───────────────────────────────────────────
   static const String home = 'home';
@@ -40,7 +46,11 @@ class AppRoutes {
   static const String welcomingFull = '$welcomingPath/$welcoming';
   static const String registerFull = '$authPath/$register';
   static const String forgotPasswordFull = '$authPath/$forgotPassword';
+  static const String verifySuccessFull = '$authPath/$verifySuccess';
   static const String homeFull = '$mainPath/$home';
+  static const String accountVerficationFull = '$authPath/$accountVerification';
+  static const String returnAccountVerficationFull = '$authPath/$returnAccountVerification';
+
   static const String mentorsFull = '$mainPath/$mentors';
-  static const String profileFull = '$mainPath/$profile';
+  static const String profileFull = '$authPath/$profile';
 }

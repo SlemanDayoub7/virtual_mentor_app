@@ -11,13 +11,17 @@ class AppAssets {
 
   // ─── Images ───────────────────────────────────────────────
   static const String backgroundShape = '$_icons/Group_3.svg';
-
+  static const String google = '$_icons/google.svg';
   // ─── Onboarding ───────────────────────────────────────────
   static const String onboarding1 = '$_images/onBoarding_1.png';
   static const String onboarding2 = '$_images/onBoarding_2.png';
   static const String onboarding3 = '$_images/onBoarding_3.png';
   static const String welcoming = '$_images/welcoming.png';
-
+  static const String register = '$_images/register.png';
+  static const String login = '$_images/login.png';
+  static const String success = '$_images/success.png';
+  static const String accountVerf = '$_images/account_verification.png';
+  static const String reVerf = '$_images/re-verification.png';
   // ─── Animations (Lottie) ──────────────────────────────────
   // static const String loadingAnimation = '$_animations/loading.json';
   // static const String successAnimation = '$_animations/success.json';

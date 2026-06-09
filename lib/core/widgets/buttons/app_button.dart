@@ -16,8 +16,9 @@ class AppButton extends StatelessWidget {
   final double? height;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
+  final Widget? prefixWidget;
+  final Widget? suffixWidget;
   final double? borderRadius;
-
   const AppButton({
     super.key,
     required this.label,
@@ -29,6 +30,8 @@ class AppButton extends StatelessWidget {
     this.height,
     this.prefixIcon,
     this.suffixIcon,
+    this.prefixWidget,
+    this.suffixWidget,
     this.borderRadius,
   });
 
@@ -52,6 +55,8 @@ class AppButton extends StatelessWidget {
           isLoading: isLoading,
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
+          prefixWidget: prefixWidget,
+          suffixWidget: suffixWidget,
           borderRadius: borderRadius,
         );
       case AppButtonType.secondary:
@@ -60,6 +65,7 @@ class AppButton extends StatelessWidget {
           onTap: onTap,
           isLoading: isLoading,
           prefixIcon: prefixIcon,
+          prefixWidget: prefixWidget,
           borderRadius: borderRadius,
         );
       case AppButtonType.outline:
@@ -68,6 +74,7 @@ class AppButton extends StatelessWidget {
           onTap: onTap,
           isLoading: isLoading,
           prefixIcon: prefixIcon,
+          prefixWidget: prefixWidget,
           borderRadius: borderRadius,
         );
       case AppButtonType.text:
@@ -90,6 +97,8 @@ class _PrimaryButton extends StatelessWidget {
   final bool isLoading;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
+  final Widget? prefixWidget;
+  final Widget? suffixWidget;
   final double? borderRadius;
 
   const _PrimaryButton({
@@ -98,6 +107,8 @@ class _PrimaryButton extends StatelessWidget {
     this.isLoading = false,
     this.prefixIcon,
     this.suffixIcon,
+    this.prefixWidget,
+    this.suffixWidget,
     this.borderRadius,
   });
 
@@ -130,12 +141,18 @@ class _PrimaryButton extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (prefixIcon != null) ...[
+                  if (prefixWidget != null) ...[
+                    prefixWidget!,
+                    SizedBox(width: AppSizes.sm),
+                  ] else if (prefixIcon != null) ...[
                     Icon(prefixIcon, size: AppSizes.iconMd),
                     SizedBox(width: AppSizes.sm),
                   ],
                   Text(label, style: AppTextStyles.button()),
-                  if (suffixIcon != null) ...[
+                  if (suffixWidget != null) ...[
+                    SizedBox(width: AppSizes.sm),
+                    suffixWidget!,
+                  ] else if (suffixIcon != null) ...[
                     SizedBox(width: AppSizes.sm),
                     Icon(suffixIcon, size: AppSizes.iconMd),
                   ],
@@ -151,6 +168,7 @@ class _SecondaryButton extends StatelessWidget {
   final VoidCallback? onTap;
   final bool isLoading;
   final IconData? prefixIcon;
+  final Widget? prefixWidget;
   final double? borderRadius;
 
   const _SecondaryButton({
@@ -158,6 +176,7 @@ class _SecondaryButton extends StatelessWidget {
     required this.onTap,
     this.isLoading = false,
     this.prefixIcon,
+    this.prefixWidget,
     this.borderRadius,
   });
 
@@ -189,7 +208,10 @@ class _SecondaryButton extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (prefixIcon != null) ...[
+                  if (prefixWidget != null) ...[
+                    prefixWidget!,
+                    SizedBox(width: AppSizes.sm),
+                  ] else if (prefixIcon != null) ...[
                     Icon(prefixIcon, size: AppSizes.iconMd),
                     SizedBox(width: AppSizes.sm),
                   ],
@@ -206,6 +228,9 @@ class _OutlineButton extends StatelessWidget {
   final VoidCallback? onTap;
   final bool isLoading;
   final IconData? prefixIcon;
+  final Widget? prefixWidget;
+  final Widget? suffixWidget;
+  final IconData? suffixIcon;
   final double? borderRadius;
 
   const _OutlineButton({
@@ -213,6 +238,9 @@ class _OutlineButton extends StatelessWidget {
     required this.onTap,
     this.isLoading = false,
     this.prefixIcon,
+    this.prefixWidget,
+    this.suffixWidget,
+    this.suffixIcon,
     this.borderRadius,
   });
 
@@ -243,15 +271,35 @@ class _OutlineButton extends StatelessWidget {
               : Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center, //////////////
+                textDirection: Directionality.of(context) == TextDirection.rtl 
+                    ? TextDirection.ltr 
+                    : TextDirection.rtl,
                 children: [
-                  if (prefixIcon != null) ...[
+                  if (prefixWidget != null) ...[
+                    prefixWidget!,
+                    SizedBox(width: AppSizes.sm),
+                  ] else if (prefixIcon != null) ...[
                     Icon(prefixIcon, size: AppSizes.iconMd),
                     SizedBox(width: AppSizes.sm),
                   ],
-                  Text(
-                    label,
-                    style: AppTextStyles.button(color: AppColors.primary),
+                  ////////////////
+                  Flexible(
+                    child: Text(
+                      label,
+                      style: AppTextStyles.button(color: AppColors.primary),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    
                   ),
+                  if (suffixWidget != null) ...[
+                    SizedBox(width: AppSizes.sm),
+                    suffixWidget!,
+                  ] else if (suffixIcon != null) ...[
+                    SizedBox(width: AppSizes.sm),
+                    Icon(suffixIcon, size: AppSizes.iconMd),
+                  ],
                 ],
               ),
     );
