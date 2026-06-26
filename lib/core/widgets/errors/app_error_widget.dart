@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../extensions/extensions.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_sizes.dart';
@@ -40,14 +41,14 @@ class AppErrorWidget extends StatelessWidget {
             SizedBox(height: AppSizes.vlg),
             Text(
               title ?? context.tr.errorGeneral,
-              style: AppTextStyles.headingS(color: context.textPrimary),
+              style: AppTextStyles.headingS(color: context.textPrimaryColor),
               textAlign: TextAlign.center,
             ),
             if (message != null) ...[
               SizedBox(height: AppSizes.vsm),
               Text(
                 message!,
-                style: AppTextStyles.bodyM(color: context.textSecondary),
+                style: AppTextStyles.bodyM(color: context.textSecondaryColor),
                 textAlign: TextAlign.center,
               ),
             ],

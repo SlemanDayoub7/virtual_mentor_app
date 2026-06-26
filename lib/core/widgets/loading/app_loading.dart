@@ -6,10 +6,11 @@ import '../../theme/app_sizes.dart';
 
 // ─── AppLoader ────────────────────────────────────────────────────────────────
 class AppLoader extends StatelessWidget {
+  final String? message;
   final Color? color;
   final double size;
 
-  const AppLoader({super.key, this.color, this.size = 32});
+  const AppLoader({super.key, this.color, this.size = 32, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +65,9 @@ class AppShimmerBox extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(borderRadius ?? AppSizes.radiusMd),
+          borderRadius: BorderRadius.circular(
+            borderRadius ?? AppSizes.radiusMd,
+          ),
         ),
       ),
     );
@@ -103,18 +105,15 @@ class AppShimmerCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                        width: 120, height: 14, color: Colors.white),
+                    Container(width: 120, height: 14, color: Colors.white),
                     SizedBox(height: AppSizes.vsm),
-                    Container(
-                        width: 80, height: 12, color: Colors.white),
+                    Container(width: 80, height: 12, color: Colors.white),
                   ],
                 ),
               ],
             ),
             SizedBox(height: AppSizes.vlg),
-            Container(
-                width: double.infinity, height: 12, color: Colors.white),
+            Container(width: double.infinity, height: 12, color: Colors.white),
             SizedBox(height: AppSizes.vsm),
             Container(width: 200, height: 12, color: Colors.white),
           ],

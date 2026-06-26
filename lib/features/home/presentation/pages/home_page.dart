@@ -11,10 +11,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      appBar: AppAppBar(
-        title: context.tr.home,
-        showBack: false,
-      ),
+      appBar: AppAppBar(title: context.tr.home, showBack: false),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -27,12 +24,12 @@ class HomePage extends StatelessWidget {
             SizedBox(height: AppSizes.vlg),
             Text(
               context.tr.appName,
-              style: AppTextStyles.headingL(color: context.textPrimary),
+              style: AppTextStyles.headingL(color: context.textPrimaryColor),
             ),
             SizedBox(height: AppSizes.vsm),
             Text(
               context.tr.welcomeMessage,
-              style: AppTextStyles.bodyL(color: context.textSecondary),
+              style: AppTextStyles.bodyL(color: context.textSecondaryColor),
               textAlign: TextAlign.center,
             ),
           ],

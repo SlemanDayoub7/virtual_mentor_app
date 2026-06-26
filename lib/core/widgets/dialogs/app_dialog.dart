@@ -16,13 +16,14 @@ class AppDialog {
   }) {
     return showDialog<bool>(
       context: context,
-      builder: (_) => _AppDialogWidget(
-        title: title,
-        message: message,
-        confirmLabel: confirmLabel ?? context.tr.confirm,
-        cancelLabel: cancelLabel ?? context.tr.cancel,
-        isDanger: isDanger,
-      ),
+      builder:
+          (_) => _AppDialogWidget(
+            title: title,
+            message: message,
+            confirmLabel: confirmLabel ?? context.tr.confirm,
+            cancelLabel: cancelLabel ?? context.tr.cancel,
+            isDanger: isDanger,
+          ),
     );
   }
 
@@ -34,12 +35,13 @@ class AppDialog {
   }) {
     return showDialog(
       context: context,
-      builder: (_) => _AppDialogWidget(
-        title: title,
-        message: message,
-        confirmLabel: buttonLabel ?? context.tr.done,
-        showCancel: false,
-      ),
+      builder:
+          (_) => _AppDialogWidget(
+            title: title,
+            message: message,
+            confirmLabel: buttonLabel ?? context.tr.done,
+            showCancel: false,
+          ),
     );
   }
 
@@ -49,13 +51,14 @@ class AppDialog {
   }) {
     return showDialog(
       context: context,
-      builder: (_) => _AppDialogWidget(
-        title: context.tr.errorGeneral,
-        message: message,
-        confirmLabel: context.tr.retry,
-        showCancel: false,
-        isDanger: true,
-      ),
+      builder:
+          (_) => _AppDialogWidget(
+            title: context.tr.errorGeneral,
+            message: message,
+            confirmLabel: context.tr.retry,
+            showCancel: false,
+            isDanger: true,
+          ),
     );
   }
 }
@@ -90,20 +93,22 @@ class _AppDialogWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              isDanger ? Icons.error_outline_rounded : Icons.info_outline_rounded,
+              isDanger
+                  ? Icons.error_outline_rounded
+                  : Icons.info_outline_rounded,
               color: isDanger ? AppColors.error : AppColors.primary,
               size: AppSizes.iconXxl,
             ),
             SizedBox(height: AppSizes.vlg),
             Text(
               title,
-              style: AppTextStyles.headingS(color: context.textPrimary),
+              style: AppTextStyles.headingS(color: context.textPrimaryColor),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: AppSizes.vsm),
             Text(
               message,
-              style: AppTextStyles.bodyM(color: context.textSecondary),
+              style: AppTextStyles.bodyM(color: context.textSecondaryColor),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: AppSizes.vxxl),
@@ -123,7 +128,8 @@ class _AppDialogWidget extends StatelessWidget {
                   child: AppButton(
                     label: confirmLabel,
                     onTap: () => Navigator.of(context).pop(true),
-                    type: isDanger ? AppButtonType.danger : AppButtonType.primary,
+                    type:
+                        isDanger ? AppButtonType.danger : AppButtonType.primary,
                   ),
                 ),
               ],

@@ -40,14 +40,14 @@ class AppEmptyWidget extends StatelessWidget {
             SizedBox(height: AppSizes.vlg),
             Text(
               title ?? context.tr.emptyGeneral,
-              style: AppTextStyles.headingS(color: context.textPrimary),
+              style: AppTextStyles.headingS(color: context.textPrimaryColor),
               textAlign: TextAlign.center,
             ),
             if (message != null) ...[
               SizedBox(height: AppSizes.vsm),
               Text(
                 message!,
-                style: AppTextStyles.bodyM(color: context.textSecondary),
+                style: AppTextStyles.bodyM(color: context.textSecondaryColor),
                 textAlign: TextAlign.center,
               ),
             ],

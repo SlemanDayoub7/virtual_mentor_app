@@ -80,85 +80,109 @@ class _AppTextFieldState extends State<AppTextField> {
         ],
         SizedBox(
           width: finalWidth,
-          height: finalHeight,      
-          child: TextFormField(
-            controller: widget.controller,
-            focusNode: widget.focusNode,
-            obscureText: widget.isPassword ? _obscureText : false,
-            readOnly: widget.readOnly,
-            enabled: widget.enabled,
-            keyboardType: widget.keyboardType,
-            textInputAction: widget.textInputAction,
-            maxLines: widget.isPassword ? 1 : widget.maxLines,
-            maxLength: widget.maxLength,
-            onChanged: widget.onChanged,
-            onTap: widget.onTap,
-            validator: widget.validator,
-            inputFormatters: widget.inputFormatters,
-            style: AppTextStyles.bodyM(color: textColor),
-            decoration: InputDecoration(
-              hintText: widget.hint,
-              errorText: widget.errorText,
-          
-              filled: true,
-              fillColor: AppColors.white,
-          
-              // Remove underline/lines -> use outline border
-              enabledBorder: 
-              widget.showBorder
-              ?OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                // ignore: deprecated_member_use
-                borderSide: BorderSide(color: Colors.grey.withOpacity(0.35), width: 1),
-              ):InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                borderSide: BorderSide(color: Colors.transparent, width: 0),
-              ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                borderSide: BorderSide(color: Colors.transparent, width: 0),
-              ),
-          
-              // Keep a visible outline shape with “rounded boundaries”
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                borderSide: BorderSide(color: Colors.transparent, width: 0),
-              ),
-          
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: AppSizes.md,
-                vertical: (finalHeight - 20.h) / 2,
-              ),
-          
-              prefixIcon: widget.prefixIcon != null
-                  ? Icon(
-                      widget.prefixIcon,
-                      color: iconColor,
-                      size: AppSizes.iconMd,
-                    )
-                  : null,
+          height: finalHeight,
+          child: Directionality(
+            textDirection:
+                (widget.keyboardType == TextInputType.emailAddress ||
+                        widget.keyboardType == TextInputType.phone ||
+                        widget.isPassword)
+                    ? TextDirection.ltr
+                    : TextDirection.rtl,
+            child: TextFormField(
+              controller: widget.controller,
+              focusNode: widget.focusNode,
+              obscureText: widget.isPassword ? _obscureText : false,
+              readOnly: widget.readOnly,
+              enabled: widget.enabled,
+              keyboardType: widget.keyboardType,
+              textInputAction: widget.textInputAction,
+              maxLines: widget.isPassword ? 1 : widget.maxLines,
+              maxLength: widget.maxLength,
+              onChanged: widget.onChanged,
+              onTap: widget.onTap,
+              validator: widget.validator,
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+              inputFormatters: widget.inputFormatters,
+              style: AppTextStyles.bodyM(color: textColor),
+              decoration: InputDecoration(
+                hintText: widget.hint,
+                errorText: widget.errorText,
 
-              // For RTL screens, put suffix icon at the end (right side)
-              // and prefix icon at the beginning (left side) via TextDirection.
-              suffixIcon: widget.isPassword
-                  ? GestureDetector(
-                      onTap: () => setState(() => _obscureText = !_obscureText),
-                      child: Icon(
-                        _obscureText
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                        color: iconColor,
-                        size: AppSizes.iconMd,
-                      ),
-                    )
-                  : widget.suffixIcon != null
-                      ? GestureDetector(
-                          onTap: widget.onSuffixTap,
-                          child: Icon(widget.suffixIcon,
-                              color: iconColor, size: AppSizes.iconMd),
+                filled: true,
+                fillColor: AppColors.white,
+
+                // Remove underline/lines -> use outline border
+                enabledBorder:
+                    widget.showBorder
+                        ? OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppSizes.radiusMd,
+                          ),
+                          // ignore: deprecated_member_use
+                          borderSide: BorderSide(
+                            color: Colors.grey.withOpacity(0.35),
+                            width: 1,
+                          ),
                         )
-                      : null,
+                        : InputBorder.none,
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                  borderSide: BorderSide(color: Colors.transparent, width: 0),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                  borderSide: BorderSide(color: Colors.transparent, width: 0),
+                ),
+
+                // Keep a visible outline shape with “rounded boundaries”
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                  borderSide: BorderSide(color: Colors.transparent, width: 0),
+                ),
+
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: AppSizes.md,
+                  vertical: (finalHeight - 20.h) / 2,
+                ),
+
+                prefixIcon:
+                    widget.prefixIcon != null
+                        ? Icon(
+                          widget.prefixIcon,
+                          color: iconColor,
+                          size: AppSizes.iconMd,
+                        )
+                        : null,
+
+                // For RTL screens, put suffix icon at the end (right side)
+                // and prefix icon at the beginning (left side) via TextDirection.
+                suffixIcon:
+                    widget.isPassword
+                        ? GestureDetector(
+                          onTap:
+                              () =>
+                                  setState(() => _obscureText = !_obscureText),
+                          child: Icon(
+                            _obscureText
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: iconColor,
+                            size: AppSizes.iconMd,
+                          ),
+                        )
+                        : widget.suffixIcon != null
+                        ? GestureDetector(
+                          onTap: widget.onSuffixTap,
+                          child: Icon(
+                            widget.suffixIcon,
+                            color: iconColor,
+                            size: AppSizes.iconMd,
+                          ),
+                        )
+                        : null,
+              ),
             ),
           ),
         ),

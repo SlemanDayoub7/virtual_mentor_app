@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:virtual_mentor_app/core/bloc/session_bloc/session_bloc.dart';
+import 'package:virtual_mentor_app/core/di/injection_container.dart';
 import '../storage/secure_storage_helper.dart';
 import 'api_constants.dart';
 
@@ -9,20 +12,24 @@ class DioClient {
   Completer<void>? _refreshCompleter;
 
   DioClient()
-      : dio = Dio(
-          BaseOptions(
-            baseUrl: ApiConstants.apiBaseUrl,
-            connectTimeout: const Duration(seconds: ApiConstants.connectTimeout),
-            receiveTimeout: const Duration(seconds: ApiConstants.receiveTimeout),
-            sendTimeout: const Duration(seconds: ApiConstants.sendTimeout),
-          ),
-        ) {
+    : dio = Dio(
+        BaseOptions(
+          baseUrl: ApiConstants.baseUrl,
+          // connectTimeout: const Duration(seconds: ApiConstants.connectTimeout),
+          // receiveTimeout: const Duration(seconds: ApiConstants.receiveTimeout),
+          // sendTimeout: const Duration(seconds: ApiConstants.sendTimeout),
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+          },
+        ),
+      ) {
     dio.interceptors.addAll([
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           final token = await SecureStorageHelper.getAccessToken();
           if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
+            options.headers['Authorization'] = 'JWT $token';
           }
           handler.next(options);
         },
@@ -92,7 +99,7 @@ class DioClient {
         error: true,
         logPrint: (object) {
           // Remove comment below to enable logging in debug mode
-          // if (kDebugMode) print(object);
+          if (kDebugMode) print(object);
         },
       ),
     ]);
@@ -107,13 +114,13 @@ class DioClient {
     try {
       final refreshDio = Dio(
         BaseOptions(
-          baseUrl: ApiConstants.apiBaseUrl,
+          baseUrl: ApiConstants.baseUrl,
           validateStatus: (status) => true,
         ),
       );
 
       final response = await refreshDio.post(
-        '/auth/tokens-refresh/',
+        '/auth/jwt/refresh/',
         data: {'refresh': refreshToken},
       );
 
@@ -128,7 +135,7 @@ class DioClient {
           response.statusCode == 404) {
         await SecureStorageHelper.clearTokens();
         // TODO: Trigger SessionBloc expired event here via GetIt
-        // sl<SessionBloc>().add(SessionExpired());
+        sl<SessionBloc>().add(SessionExpired());
         return false;
       }
 

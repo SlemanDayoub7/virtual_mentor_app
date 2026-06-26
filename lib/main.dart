@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:virtual_mentor_app/core/bloc/session_bloc/session_bloc.dart';
 import 'app.dart';
 import 'core/bloc/locale_bloc/locale_bloc.dart';
 import 'core/bloc/theme_bloc/theme_bloc.dart';
@@ -11,9 +12,7 @@ void main() async {
 
   // ─── System UI ────────────────────────────────────────────
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-    ),
+    const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
   );
 
   // ─── Lock Orientation ─────────────────────────────────────
@@ -31,6 +30,6 @@ void main() async {
   // ─── Load Saved Theme & Locale ────────────────────────────
   sl<ThemeBloc>().add(ThemeLoaded());
   sl<LocaleBloc>().add(LocaleLoaded());
-
+  sl<SessionBloc>().add(SessionStarted());
   runApp(const App());
 }
