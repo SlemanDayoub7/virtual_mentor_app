@@ -1,101 +1,232 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:virtual_mentor_app/features/onboarding/presentation/pages/welcoming_page.dart';
-import 'package:virtual_mentor_app/features/profile/presentation/pages/profile.dart';
-import 'package:virtual_mentor_app/features/register/presentation/pages/login.dart';
-import 'package:virtual_mentor_app/features/verification/presentaion/pages/verification-success.dart';
-import 'package:virtual_mentor_app/features/verification/presentaion/pages/account-verification.dart';
-import 'package:virtual_mentor_app/features/verification/presentaion/pages/return-account-verification.dart';
+import 'package:virtual_mentor_app/core/di/injection_container.dart';
+import 'package:virtual_mentor_app/features/auth/presentation/screens/account_screen.dart';
+import 'package:virtual_mentor_app/features/auth/presentation/screens/forgot_password_screen.dart';
+import 'package:virtual_mentor_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:virtual_mentor_app/features/auth/presentation/screens/otp_screen.dart';
+import 'package:virtual_mentor_app/features/auth/presentation/screens/register_screen.dart';
+import 'package:virtual_mentor_app/features/auth/presentation/screens/reset_password_screen.dart';
+import 'package:virtual_mentor_app/features/course/domain/entities/category_entity.dart';
+import 'package:virtual_mentor_app/features/course/domain/entities/subject_entity.dart';
+import 'package:virtual_mentor_app/features/course/presentation/screens/categories_screen.dart';
+import 'package:virtual_mentor_app/features/course/presentation/screens/skills_screen.dart';
+import 'package:virtual_mentor_app/features/course/presentation/screens/subjects_screen.dart';
+import 'package:virtual_mentor_app/features/main/pages/main_page.dart';
+import '../../core/bloc/session_bloc/session_bloc.dart';
 
-import '../../features/register/presentation/pages/register.dart';
-import '../../features/home/router/home_routes.dart';
-import '../../features/splash/presentation/pages/splash_page.dart';
-import '../../features/onboarding/presentation/pages/onboarding_page.dart';
-import 'app_routes.dart';
+// ─── Route names ──────────────────────────────────────────────────────────────
+abstract class AppRoutes {
+  static const splash = '/';
+  static const login = '/login';
+  static const register = '/register';
+  static const otp = '/otp';
+  static const forgotPassword = '/forgot-password';
+  static const resetPassword = '/reset-password';
+  static const home = '/home';
+  static const account = '/account';
+  static const categories = '/categories';
+  static const subjects = '/categories/:categoryId/subjects';
+  static const skills = '/categories/:categoryId/subjects/:subjectId/skills';
+}
 
-class AppRouter {
-  AppRouter._();
+// ─── Router ───────────────────────────────────────────────────────────────────
+GoRouter createRouter(SessionBloc sessionBloc) {
+  return GoRouter(
+    initialLocation: AppRoutes.splash,
+    refreshListenable: GoRouterRefreshListenable(sessionBloc),
+    redirect: (context, state) {
+      final session = sessionBloc.state;
+      final location = state.matchedLocation;
 
-  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+      print(
+        'Router redirect - Session state: ${session.runtimeType}, Location: $location',
+      );
 
-  static GoRouter get router => GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.verifySuccessFull,
+      // حالة التحميل - ابق على شاشة Splash
+      if (session is SessionInitial) {
+        print('Still on splash screen - waiting for session check');
+        return null;
+      }
+
+      // IMPORTANT: معالجة شاشة Splash بشكل خاص
+      if (location == AppRoutes.splash) {
+        if (session is SessionAuthenticated) {
+          print('✅ Authenticated user on splash -> redirecting to home');
+          return AppRoutes.home;
+        }
+        if (session is SessionUnauthenticated) {
+          print('❌ Unauthenticated user on splash -> redirecting to login');
+          return AppRoutes.login;
+        }
+      }
+
+      // للمستخدم غير المسجل الدخول - اذا حاول دخول صفحات protected
+      if (session is SessionUnauthenticated) {
+        // قائمة الصفحات المسموحة للمستخدم غير المسجل
+        const publicRoutes = {
+          AppRoutes.login,
+          AppRoutes.register,
+          AppRoutes.otp,
+          AppRoutes.forgotPassword,
+          AppRoutes.resetPassword,
+        };
+
+        if (!publicRoutes.contains(location)) {
+          print(
+            'Unauthenticated user trying to access $location -> redirecting to login',
+          );
+          return AppRoutes.login;
+        }
+      }
+
+      // للمستخدم المسجل الدخول - اذا حاول دخول صفحات auth
+      if (session is SessionAuthenticated) {
+        const authRoutes = {
+          AppRoutes.login,
+          AppRoutes.register,
+          AppRoutes.otp,
+          AppRoutes.forgotPassword,
+          AppRoutes.resetPassword,
+        };
+
+        if (authRoutes.contains(location)) {
+          print(
+            'Authenticated user trying to access auth page $location -> redirecting to home',
+          );
+          return AppRoutes.home;
+        }
+      }
+
+      print('No redirect needed - staying on $location');
+      return null;
+    },
     routes: [
-      // ─── Splash ───────────────────────────────────
+      // ── Splash / initial ──────────────────────────────────────────────────
       GoRoute(
-        path: AppRoutes.rootPath,
-        name: AppRoutes.splash,
-        builder: (_, __) => const SplashPage(),
+        path: AppRoutes.splash,
+        name: 'splash',
+        builder: (context, state) => const _SplashScreen(),
       ),
 
-      // ─── Onboarding ───────────────────────────────
+      // ── Auth routes ───────────────────────────────────────────────────────
       GoRoute(
-        path: AppRoutes.onboardingPath,
-        name: AppRoutes.onboarding,
-        builder: (_, __) => const OnboardingPage(),
+        path: AppRoutes.login,
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
       ),
-      // ─── Welcoming ───────────────────────────────
       GoRoute(
-        path: '${AppRoutes.welcomingPath}/${AppRoutes.welcoming}',
-        name: AppRoutes.welcoming,
-        builder: (_, __) => const WelcomingPage(),
+        path: AppRoutes.register,
+        name: 'register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.otp,
+        name: 'otp',
+        builder: (context, state) {
+          final email = state.extra as String;
+          return OtpScreen(email: email);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        name: 'forgotPassword',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.resetPassword,
+        name: 'resetPassword',
+        builder: (context, state) {
+          final email = state.extra as String;
+          return ResetPasswordScreen(email: email);
+        },
       ),
 
-      // ─── Register ───────────────────────────────
+      // ── Authenticated routes ───────────────────────────────────────────────
       GoRoute(
-        path: '${AppRoutes.authPath}/${AppRoutes.register}',
-        name: AppRoutes.register,
-        builder: (_, __) => const RegisterScreen(),
+        path: AppRoutes.home,
+        name: 'home',
+        builder: (context, state) => MainPage(),
       ),
-      // ─── login ───────────────────────────────
       GoRoute(
-        path: '${AppRoutes.authPath}/${AppRoutes.login}',
-        name: AppRoutes.login,
-        builder: (_, __) => const LoginScreen(),
+        path: AppRoutes.account,
+        name: 'account',
+        builder: (context, state) => const AccountScreen(),
       ),
-      
-      // ─── Verification Success ───────────────────────────────
       GoRoute(
-        path: '${AppRoutes.authPath}/${AppRoutes.verifySuccess}',
-        name: AppRoutes.verifySuccess,
-        builder: (_, __) => const VerificationSuccessScreen(),
+        path: AppRoutes.categories,
+        name: 'categories',
+        builder: (context, state) => CategoriesScreen(),
       ),
-      
-      // ─── Account Verification ──────────────────────────────
       GoRoute(
-        path: '${AppRoutes.authPath}/${AppRoutes.accountVerification}',
-        name: AppRoutes.accountVerification,
-        builder: (_, __) => const AccountVerficationScreen(),
+        path: AppRoutes.subjects,
+        name: 'subjects',
+        builder: (context, state) {
+          final category = state.extra as CategoryEntity;
+          return SubjectsScreen(category: category);
+        },
       ),
-
-      // ─── Return Account Verification ──────────────────────
       GoRoute(
-        path: '${AppRoutes.authPath}/${AppRoutes.returnAccountVerification}',
-        name: AppRoutes.returnAccountVerification,
-        builder: (_, __) => const ReturnAccountScreen(),
+        path: AppRoutes.skills,
+        name: 'skills',
+        builder: (context, state) {
+          final subject = state.extra as SubjectEntity;
+          return SkillsScreen(subject: subject);
+        },
       ),
-       GoRoute(
-        path: '${AppRoutes.authPath}/${AppRoutes.profile}',
-        name: AppRoutes.profile,
-        builder: (_, __) => const CompleteProfileScreen(),
-      ),
-      // ─── Main ─────────────────────────────────────
-GoRoute(
-        path:'${AppRoutes.mainPath}/${AppRoutes.mentors}',
-        builder: (_, __) => const SizedBox.shrink(),
-        routes: homeRoutes,
-      ),
-      // ─── Complete Profile (Direct) ──────────────────────────────
     ],
-    errorBuilder: (_, __) => const _RouteNotFoundPage(),
   );
 }
-class _RouteNotFoundPage extends StatelessWidget {
-  const _RouteNotFoundPage();
+
+// Custom refresh listenable that properly notifies GoRouter when bloc changes
+class GoRouterRefreshListenable extends ChangeNotifier {
+  final SessionBloc bloc;
+  late final StreamSubscription<SessionState> _subscription;
+
+  GoRouterRefreshListenable(this.bloc) {
+    _subscription = bloc.stream.listen((_) {
+      print('🔄 Session state changed - notifying router');
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+// ── Minimal splash — shown only during SessionInitial ─────────────────────────
+class _SplashScreen extends StatefulWidget {
+  const _SplashScreen();
+
+  @override
+  State<_SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<_SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    print('📱 SplashScreen mounted');
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('404 - Page not found')));
+    return const Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text('Loading...'),
+          ],
+        ),
+      ),
+    );
   }
 }

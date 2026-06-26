@@ -1,14 +1,24 @@
 class ApiConstants {
   ApiConstants._();
 
-  static const String baseUrl = 'https://api.virtualmentor.com';
-  static const String apiVersion = '/api/v1';
-  static const String apiBaseUrl = '$baseUrl$apiVersion';
+  static const String baseUrl =
+      'https://danita-astrometric-avengingly.ngrok-free.dev';
+  static const String apiBaseUrl = baseUrl;
 
   // Timeouts
   static const int connectTimeout = 30; // seconds
   static const int receiveTimeout = 30;
   static const int sendTimeout = 30;
+
+  // ===== AUTH ENDPOINTS =====
+  static const String login = '/auth/jwt/create';
+  static const String googleLogin = '/api/auth/google/';
+  static const String register = '/auth/users/';
+  static const String activateAccount = '/api/verify-otp/';
+  static const String resendOtp = '/api/resend-otp/';
+  static const String refreshToken = '/auth/tokens-refresh/';
+  static const String skillProfiles = '/api/skill-profiles';
+  static const String conceptProfiles = '/api/concept-profiles/';
 }
 
 class ApiErrors {

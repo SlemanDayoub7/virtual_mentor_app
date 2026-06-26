@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'package:virtual_mentor_app/l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 
 // ─── Translation Extension ────────────────────────────────────────────────────
@@ -15,41 +16,55 @@ extension ThemeExtension on BuildContext {
   TextTheme get textTheme => Theme.of(this).textTheme;
   bool get isDark => Theme.of(this).brightness == Brightness.dark;
 
+  // ─── Brand Colors ──────────────────────────────────────────────────────────
+  Color get primaryColor => isDark ? AppColors.primaryDark : AppColors.primary;
+  Color get primaryDarkColor =>
+      isDark ? AppColors.primaryDark : AppColors.primaryDark;
+  Color get primaryLightColor =>
+      isDark ? AppColors.primaryLight : AppColors.primaryLight;
+  Color get skyBlueColor => isDark ? AppColors.skyBlue : AppColors.skyBlue;
+
+  // ─── Background Colors ─────────────────────────────────────────────────────
   Color get backgroundColor =>
       isDark ? AppColors.darkBackground : AppColors.lightBackground;
+  Color get screenBackgroundColor =>
+      isDark ? AppColors.darkBackground : AppColors.screenBackground;
+  Color get cardBackgroundColor =>
+      isDark ? AppColors.darkSurface : AppColors.cardBackground;
   Color get surfaceColor =>
       isDark ? AppColors.darkSurface : AppColors.lightSurface;
-  Color get textPrimary =>
+  Color get surfaceVariantColor =>
+      isDark ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant;
+
+  // ─── Text Colors ───────────────────────────────────────────────────────────
+  Color get textPrimaryColor =>
       isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-  Color get textSecondary =>
+  Color get textSecondaryColor =>
       isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-  Color get textHint =>
+  Color get textHintColor =>
       isDark ? AppColors.darkTextHint : AppColors.lightTextHint;
+
+  // ─── UI Colors ─────────────────────────────────────────────────────────────
   Color get borderColor =>
       isDark ? AppColors.darkBorder : AppColors.lightBorder;
   Color get dividerColor =>
       isDark ? AppColors.darkDivider : AppColors.lightDivider;
   Color get iconColor => isDark ? AppColors.darkIcon : AppColors.lightIcon;
-  Color get surfaceVariant =>
-      isDark ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant;
-}
 
-// ─── Navigation Extension ─────────────────────────────────────────────────────
-extension NavigationExtension on BuildContext {
-  void pushNamed(String route, {Object? extra, Map<String, String>? params}) =>
-      GoRouter.of(
-        this,
-      ).pushNamed(route, extra: extra, pathParameters: params ?? {});
+  // ─── Semantic Colors ───────────────────────────────────────────────────────
+  Color get errorColor => AppColors.error;
+  Color get successColor => AppColors.success;
 
-  void goNamed(String route, {Object? extra, Map<String, String>? params}) =>
-      GoRouter.of(
-        this,
-      ).goNamed(route, extra: extra, pathParameters: params ?? {});
+  // ─── Static Colors ─────────────────────────────────────────────────────────
+  Color get whiteColor => AppColors.white;
+  Color get blackColor => AppColors.black;
+  Color get transparentColor => AppColors.transparent;
 
-  void push(String path) => GoRouter.of(this).push(path);
-  void go(String path) => GoRouter.of(this).go(path);
-  void pop([Object? result]) => GoRouter.of(this).pop(result);
-  bool canPop() => GoRouter.of(this).canPop();
+  // ─── Grey Scale ────────────────────────────────────────────────────────────
+  Color get grey100Color => AppColors.grey100;
+  Color get grey200Color => AppColors.grey200;
+  Color get grey400Color => AppColors.grey400;
+  Color get grey500Color => AppColors.grey500;
 }
 
 // ─── Spacing Extension ────────────────────────────────────────────────────────

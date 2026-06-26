@@ -1,5 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
+import 'package:virtual_mentor_app/features/auth/di/auth_dependencies.dart';
+import 'package:virtual_mentor_app/features/course/di/course_dependencies.dart';
 import '../../features/home/di/home_injection.dart';
 import '../bloc/locale_bloc/locale_bloc.dart';
 import '../bloc/session_bloc/session_bloc.dart';
@@ -19,6 +21,8 @@ Future<void> setupInjection() async {
   // ─── Features ─────────────────────────────────────────────
 
   setupHomeInjection();
+  registerAuthDependencies(sl);
+  registerCourseDependencies(sl);
   // Add more features here:
   // setupMentorInjection();
   // setupSessionsInjection();

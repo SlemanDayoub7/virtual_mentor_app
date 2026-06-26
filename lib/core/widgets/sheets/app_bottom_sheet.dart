@@ -20,13 +20,14 @@ class AppBottomSheet {
       isDismissible: isDismissible,
       isScrollControlled: isScrollControlled,
       backgroundColor: Colors.transparent,
-      builder: (_) => _AppBottomSheetContent(
-        title: title,
-        initialChildSize: initialChildSize ?? 0.5,
-        minChildSize: minChildSize ?? 0.3,
-        maxChildSize: maxChildSize ?? 0.95,
-        child: child,
-      ),
+      builder:
+          (_) => _AppBottomSheetContent(
+            title: title,
+            initialChildSize: initialChildSize ?? 0.5,
+            minChildSize: minChildSize ?? 0.3,
+            maxChildSize: maxChildSize ?? 0.95,
+            child: child,
+          ),
     );
   }
 }
@@ -77,10 +78,14 @@ class _AppBottomSheetContent extends StatelessWidget {
               if (title != null) ...[
                 SizedBox(height: AppSizes.vlg),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppSizes.pagePadding),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSizes.pagePadding,
+                  ),
                   child: Text(
                     title!,
-                    style: AppTextStyles.headingS(color: context.textPrimary),
+                    style: AppTextStyles.headingS(
+                      color: context.textPrimaryColor,
+                    ),
                   ),
                 ),
               ],

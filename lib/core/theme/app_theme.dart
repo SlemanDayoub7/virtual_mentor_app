@@ -36,14 +36,7 @@ class AppTheme {
         statusBarIconBrightness: Brightness.dark,
       ),
     ),
-    cardTheme: CardTheme(
-      color: AppColors.cardBackground,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        side: const BorderSide(color: AppColors.border, width: 1),
-      ),
-    ),
+
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.skyBlue,
@@ -122,14 +115,7 @@ class AppTheme {
         statusBarIconBrightness: Brightness.light,
       ),
     ),
-    cardTheme: CardTheme(
-      color: AppColors.darkSurface,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        side: const BorderSide(color: AppColors.darkBorder, width: 1),
-      ),
-    ),
+
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.darkSurfaceVariant,
