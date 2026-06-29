@@ -184,15 +184,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                 //   SessionLoggedIn(),
                                 // );
                                 // return;
-                                if (_formKey.currentState?.validate() ??
-                                    false) {
-                                  context.read<LoginBloc>().add(
-                                    LoginSubmitted(
-                                      email: _emailController.text.trim(),
-                                      password: _passwordController.text,
-                                    ),
-                                  );
-                                }
+                                // if (_formKey.currentState?.validate() ??
+                                //     false) {
+                                context.read<LoginBloc>().add(
+                                  LoginSubmitted(
+                                    email: _emailController.text.trim(),
+                                    password: _passwordController.text,
+                                  ),
+                                );
+                                // }
                               },
                             );
                           },

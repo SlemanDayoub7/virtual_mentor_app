@@ -30,13 +30,16 @@ android {
         versionName = flutter.versionName
     }
 
-    buildTypes {
+        buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            
+            // Disabling these entirely will isolate if R8 is breaking your network maps
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
+
 }
 
 flutter {

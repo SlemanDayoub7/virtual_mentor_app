@@ -18,39 +18,37 @@ class HomeGreetingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            greeting,
-            style: AppTextStyles.bodyRegular(color: context.textSecondaryColor),
-          ),
-          SizedBox(height: 10.h),
-          Text(name, style: AppTextStyles.titleBold()),
-          SizedBox(height: 10.h),
-          Row(
-            children: [
-              Container(
-                width: 14.r,
-                height: 14.r,
-                decoration: BoxDecoration(
-                  color: context.skyBlueColor,
-                  shape: BoxShape.circle,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 10.h),
+        Text(
+          greeting,
+          style: AppTextStyles.bodyRegular(color: context.textSecondaryColor),
+        ),
+        SizedBox(height: 10.h),
+        Text(name, style: AppTextStyles.titleBold()),
+        SizedBox(height: 10.h),
+        Row(
+          children: [
+            Container(
+              width: 14.r,
+              height: 14.r,
+              decoration: BoxDecoration(
+                color: context.skyBlueColor,
+                shape: BoxShape.circle,
               ),
-              SizedBox(width: 4.w),
-              Text(
-                specialty,
-                style: AppTextStyles.captionRegular(
-                  color: context.textSecondaryColor,
-                ),
+            ),
+            SizedBox(width: 4.w),
+            Text(
+              specialty,
+              style: AppTextStyles.titleMedium(
+                color: context.textSecondaryColor,
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

@@ -57,26 +57,23 @@ class _ProfileTabState extends State<ProfileTab> {
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          backgroundColor: context.screenBackgroundColor,
-          body: SafeArea(
-            child: switch (state) {
-              ProfileLoading() || ProfileUpdating() || ProfileDeleting() =>
-                const Center(child: CircularProgressIndicator()),
+        return SafeArea(
+          child: switch (state) {
+            ProfileLoading() || ProfileUpdating() || ProfileDeleting() =>
+              const Center(child: CircularProgressIndicator()),
 
-              ProfileError(:final message) => _ErrorBody(
-                message: message,
-                onRetry: () => context.read<ProfileCubit>().loadProfile(),
-              ),
+            ProfileError(:final message) => _ErrorBody(
+              message: message,
+              onRetry: () => context.read<ProfileCubit>().loadProfile(),
+            ),
 
-              ProfileLoaded(:final profile) ||
-              ProfileUpdateSuccess(
-                :final profile,
-              ) => _ProfileBody(profile: profile),
+            ProfileLoaded(:final profile) ||
+            ProfileUpdateSuccess(
+              :final profile,
+            ) => _ProfileBody(profile: profile),
 
-              _ => const Center(child: CircularProgressIndicator()),
-            },
-          ),
+            _ => const Center(child: CircularProgressIndicator()),
+          },
         );
       },
     );
@@ -293,23 +290,6 @@ class _ProfileAvatar extends StatelessWidget {
                         size: 52.r,
                         color: context.textSecondaryColor,
                       ),
-            ),
-          ),
-          Container(
-            width: 26.r,
-            height: 26.r,
-            decoration: BoxDecoration(
-              color: context.primaryColor,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: context.cardBackgroundColor,
-                width: 2.w,
-              ),
-            ),
-            child: Icon(
-              Icons.camera_alt_outlined,
-              size: 14.r,
-              color: context.whiteColor,
             ),
           ),
         ],

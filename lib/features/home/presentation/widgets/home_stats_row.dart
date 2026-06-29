@@ -10,12 +10,12 @@ class HomeStatsRow extends StatelessWidget {
     super.key,
     required this.materialsCount,
     required this.achievementPercent,
-    required this.testsCount,
+    required this.xp,
   });
 
   final int materialsCount;
-  final int achievementPercent;
-  final int testsCount;
+  final double achievementPercent;
+  final int xp;
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +42,8 @@ class HomeStatsRow extends StatelessWidget {
           Expanded(
             child: _StatCard(
               svgAsset: 'assets/icons/ic_quiz.svg',
-              label: 'الاختبارات',
-              value: '$testsCount',
+              label: 'Xp',
+              value: '$xp',
             ),
           ),
         ],
@@ -65,19 +65,20 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: AppSizes.vsm,
-        horizontal: AppSizes.sm,
-      ),
-      decoration: BoxDecoration(
-        color: context.cardBackgroundColor,
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        border: Border.all(color: context.borderColor),
-      ),
-      child: Column(
-        children: [
-          SvgPicture.asset(
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(
+            vertical: AppSizes.sm,
+            horizontal: AppSizes.sm,
+          ),
+          decoration: BoxDecoration(
+            color: context.cardBackgroundColor,
+            // borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+            border: Border.all(color: context.borderColor),
+            shape: BoxShape.circle,
+          ),
+          child: SvgPicture.asset(
             svgAsset,
             width: 24.r,
             height: 24.r,
@@ -86,12 +87,30 @@ class _StatCard extends StatelessWidget {
               BlendMode.srcIn,
             ),
           ),
-          SizedBox(height: 4.h),
-          Text(label, style: AppTextStyles.captionRegular(color: context.textSecondaryColor)),
-          SizedBox(height: 2.h),
-          Text(value, style: AppTextStyles.labelRegular()),
-        ],
-      ),
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          label,
+          style: AppTextStyles.captionRegular(
+            color: context.textSecondaryColor,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 4.r, horizontal: 8.r),
+          decoration: BoxDecoration(
+            color: context.skyBlueColor,
+            borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+            border: Border.all(color: context.borderColor),
+          ),
+          child: Text(
+            value,
+            style: AppTextStyles.labelRegular(
+              color: context.theme.primaryColor,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

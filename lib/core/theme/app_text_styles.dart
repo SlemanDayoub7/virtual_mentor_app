@@ -22,7 +22,7 @@ class AppTextStyles {
   // ─── Title Bold 20 ──────────────────────────────────────
   static TextStyle titleBold({Color? color}) => TextStyle(
     fontFamily: AppFonts.primary,
-    fontSize: 20.sp,
+    fontSize: 24.sp,
     fontWeight: FontWeight.w700,
     height: 1.0,
     letterSpacing: 0,
@@ -41,7 +41,7 @@ class AppTextStyles {
   // ─── Body Bold 16 ─────────────────────────────────────────
   static TextStyle bodyBold({Color? color}) => TextStyle(
     fontFamily: AppFonts.primary,
-    fontSize: 16.sp,
+    fontSize: 18.sp,
     fontWeight: FontWeight.w700,
     height: 1.0,
     letterSpacing: 0,
@@ -72,6 +72,14 @@ class AppTextStyles {
   static TextStyle captionRegular({Color? color}) => TextStyle(
     fontFamily: AppFonts.primary,
     fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+    height: 1.0,
+    letterSpacing: 0,
+    color: color ?? AppColors.textSecondary,
+  );
+  static TextStyle captionMedium({Color? color}) => TextStyle(
+    fontFamily: AppFonts.primary,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w400,
     height: 1.0,
     letterSpacing: 0,

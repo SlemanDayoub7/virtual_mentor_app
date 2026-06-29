@@ -7,6 +7,7 @@ import 'package:virtual_mentor_app/features/auth/presentation/blocs/login_bloc.d
 import 'package:virtual_mentor_app/features/auth/presentation/blocs/otp_bloc.dart';
 import 'package:virtual_mentor_app/features/auth/presentation/blocs/password_bloc.dart';
 import 'package:virtual_mentor_app/features/auth/presentation/blocs/register_bloc.dart';
+import 'package:virtual_mentor_app/features/course/presentation/blocs/category_progress/category_progress_bloc.dart';
 import 'package:virtual_mentor_app/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:virtual_mentor_app/l10n/app_localizations.dart';
 import 'core/bloc/locale_bloc/locale_bloc.dart';
@@ -32,6 +33,7 @@ class App extends StatelessWidget {
             BlocProvider.value(value: sl<SessionBloc>()),
             BlocProvider.value(value: sl<ThemeBloc>()),
             BlocProvider.value(value: sl<LocaleBloc>()),
+            BlocProvider(create: (_) => sl<CategoryProgressBloc>()),
             BlocProvider(create: (_) => sl<LoginBloc>()),
             BlocProvider(create: (_) => sl<RegisterBloc>()),
             BlocProvider(create: (_) => sl<AccountBloc>()),

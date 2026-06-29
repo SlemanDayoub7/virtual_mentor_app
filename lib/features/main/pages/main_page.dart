@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -53,16 +55,48 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // IndexedStack يحافظ على حالة جميع الصفحات حتى لو كانت غير مرئية
-      body: IndexedStack(index: _selectedIndex, children: _pages),
-      bottomNavigationBar: _BottomNav(
-        selectedIndex: _selectedIndex,
-        items: _navItems,
-        onItemTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+      backgroundColor: context.backgroundColor,
+      body: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            right: 0,
+            child: SvgPicture.asset(
+              AppAssets.backgroundShape,
+              width: 57.w,
+              height: 1.sh,
+              fit: BoxFit.contain,
+            ),
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(
+                color: Colors.transparent, // Makes the blur visible
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: EdgeInsets.only(bottom: AppSizes.bottomNavHeight),
+            child: IndexedStack(index: _selectedIndex, children: _pages),
+          ),
+          Positioned(
+            bottom: 0,
+            child: SizedBox(
+              width: 1.sw,
+              child: _BottomNav(
+                selectedIndex: _selectedIndex,
+                items: _navItems,
+                onItemTap: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

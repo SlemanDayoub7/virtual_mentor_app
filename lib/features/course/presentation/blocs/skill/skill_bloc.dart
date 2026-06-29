@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../../domain/entities/skill_entity.dart';
+import 'package:virtual_mentor_app/features/course/domain/entities/skill_entity.dart';
+
 import '../../../domain/usecases/get_skills_by_subject_usecase.dart';
 
 part 'skill_event.dart';

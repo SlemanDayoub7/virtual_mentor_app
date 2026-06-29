@@ -1,3 +1,5 @@
+// lib/core/constants/api_constants.dart
+
 class ApiConstants {
   ApiConstants._();
 
@@ -6,7 +8,7 @@ class ApiConstants {
   static const String apiBaseUrl = baseUrl;
 
   // Timeouts
-  static const int connectTimeout = 30; // seconds
+  static const int connectTimeout = 30;
   static const int receiveTimeout = 30;
   static const int sendTimeout = 30;
 
@@ -19,6 +21,29 @@ class ApiConstants {
   static const String refreshToken = '/auth/tokens-refresh/';
   static const String skillProfiles = '/api/skill-profiles';
   static const String conceptProfiles = '/api/concept-profiles/';
+
+  // ===== COURSE ENDPOINTS =====
+  static const String categories = '/api/categories/';
+
+  static String getCategoryProgress(int categoryId) {
+    return '/api/category-progress/$categoryId/';
+  }
+
+  static String getSubjectsByCategory(int categoryId) {
+    return '/api/categories/$categoryId/subjects/';
+  }
+
+  static String getSkillsBySubject(int categoryId, int subjectId) {
+    return '/api/categories/$categoryId/subjects/$subjectId/skills/';
+  }
+
+  static String getSkillProfiles() {
+    return '/api/skill-profiles';
+  }
+
+  static String getSkillProfile(int skillProfileId) {
+    return '/api/skill-profiles/$skillProfileId/';
+  }
 }
 
 class ApiErrors {
