@@ -27,7 +27,6 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     _initAnimations();
-    _navigateAfterDelay();
   }
 
   void _initAnimations() {
@@ -51,28 +50,6 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _animationController.forward();
-  }
-
-  Future<void> _navigateAfterDelay() async {
-    // Wait for 2 seconds while animation plays
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (!mounted) return;
-
-    // Check if user has valid tokens
-    final hasTokens = await SecureStorageHelper.hasTokens();
-
-    // Dispatch session event based on token status
-    if (hasTokens) {
-      context.read<SessionBloc>().add(SessionStarted());
-    } else {
-      context.read<SessionBloc>().add(SessionExpired());
-    }
-
-    // Navigate based on session state (will be handled by router redirect)
-    // But we need to trigger a rebuild to let router handle it
-    // So we just emit a state change
-    setState(() {});
   }
 
   @override

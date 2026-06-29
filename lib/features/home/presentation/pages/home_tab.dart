@@ -2,219 +2,240 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:virtual_mentor_app/core/di/injection_container.dart';
 import 'package:virtual_mentor_app/core/extensions/extensions.dart';
 import 'package:virtual_mentor_app/core/router/app_router.dart';
 import 'package:virtual_mentor_app/core/theme/app_sizes.dart';
 import 'package:virtual_mentor_app/core/theme/app_text_styles.dart';
+import 'package:virtual_mentor_app/core/widgets/image/app_image.dart';
 import 'package:virtual_mentor_app/features/auth/domain/entities/profile_entity.dart';
+import 'package:virtual_mentor_app/features/course/domain/entities/category_progress_entity.dart';
+import 'package:virtual_mentor_app/features/course/presentation/blocs/category_progress/category_progress_bloc.dart';
+import 'package:virtual_mentor_app/features/course/presentation/blocs/subject_detail/subject_detail_bloc.dart';
+import 'package:virtual_mentor_app/features/course/presentation/screens/subject_detail_screen.dart';
+import 'package:virtual_mentor_app/features/home/presentation/widgets/error_header.dart';
+import 'package:virtual_mentor_app/features/home/presentation/widgets/home_search_bar.dart';
+import 'package:virtual_mentor_app/features/home/presentation/widgets/home_stats_row.dart';
+import 'package:virtual_mentor_app/features/home/presentation/widgets/profile_header.dart';
 import 'package:virtual_mentor_app/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:virtual_mentor_app/features/profile/presentation/cubit/profile_state.dart';
-import '../widgets/home_course_card.dart';
-import '../widgets/home_stats_row.dart';
 import '../widgets/home_greeting_header.dart';
 
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
 
-  // Sample data — replace with real domain models/bloc state
-  static const List<_CourseData> _courses = [
-    _CourseData(
-      svgAsset: 'assets/icons/ic_design.svg',
-      title: 'تصميم واجهات المستخدم',
-      subtitle: '6 مقارات · اخر نشاط منذ يومان',
-      completedLessons: 8,
-      totalLessons: 8,
-      progressPercent: 1.0,
-      statusLabel: 'مكتمل',
-      isComplete: true,
-    ),
-    _CourseData(
-      svgAsset: 'assets/icons/ic_analytics.svg',
-      title: 'تحليل البيانات',
-      subtitle: '8 مقارات · اخر نشاط اليوم',
-      completedLessons: 6,
-      totalLessons: 8,
-      progressPercent: 0.75,
-      statusLabel: '',
-      isComplete: false,
-    ),
-    _CourseData(
-      svgAsset: 'assets/icons/ic_security.svg',
-      title: 'أمن المعلومات',
-      subtitle: '12 مقارة · اختبار قادم',
-      completedLessons: 5,
-      totalLessons: 12,
-      progressPercent: 0.42,
-      statusLabel: '',
-      isComplete: false,
-    ),
-    _CourseData(
-      svgAsset: 'assets/icons/ic_mobile.svg',
-      title: 'تطوير واجهات المستخدم',
-      subtitle: '23 مقارة · اخر نشاط منذ يومان',
-      completedLessons: 0,
-      totalLessons: 23,
-      progressPercent: 0.0,
-      statusLabel: 'لم يتم البدأ',
-      isComplete: false,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.screenBackgroundColor,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSizes.pagePadding,
-                  vertical: AppSizes.vmd,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    // ✅ BlocBuilder مع حالات التحميل والخطأ
-                    BlocBuilder<ProfileCubit, ProfileState>(
-                      builder: (context, state) {
-                        return switch (state) {
-                          // ✅ حالة التحميل
-                          ProfileLoading() => _LoadingHeader(),
+    return SafeArea(
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSizes.pagePadding,
+                vertical: AppSizes.vmd,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  BlocBuilder<ProfileCubit, ProfileState>(
+                    builder: (context, state) {
+                      return switch (state) {
+                        ProfileLoading() => _LoadingHeader(),
+                        ProfileError(:final message) => ErrorHeader(
+                          message: message,
+                          onRetry:
+                              () => context.read<ProfileCubit>().loadProfile(),
+                        ),
+                        ProfileLoaded(:final profile) ||
+                        ProfileUpdateSuccess(:final profile) => ProfileHeader(
+                          profile: profile,
+                          onSelectSpecialty: () {
+                            context.push(AppRoutes.categories);
+                          },
+                        ),
+                        _ => const SizedBox.shrink(),
+                      };
+                    },
+                  ),
+                  BlocBuilder<ProfileCubit, ProfileState>(
+                    builder: (context, state) {
+                      if (state is ProfileLoaded ||
+                          state is ProfileUpdateSuccess) {
+                        final profile =
+                            state is ProfileLoaded
+                                ? state.profile
+                                : (state as ProfileUpdateSuccess).profile;
 
-                          // ✅ حالة الخطأ
-                          ProfileError(:final message) => _ErrorHeader(
-                            message: message,
-                            onRetry:
-                                () =>
-                                    context.read<ProfileCubit>().loadProfile(),
-                          ),
+                        final categoryId = profile.profile?.currentCategory?.id;
 
-                          // ✅ حالة نجاح تحميل البيانات
-                          ProfileLoaded(:final profile) ||
-                          ProfileUpdateSuccess(
-                            :final profile,
-                          ) => _ProfileHeader(
-                            profile: profile,
-                            onSelectSpecialty: () {
-                              context.push(AppRoutes.categories);
-                            },
-                          ),
+                        // If no category selected, show empty state
+                        if (categoryId == null) {
+                          return EmptyCategoryProgress();
+                        }
 
-                          // ✅ أي حالة أخرى (افتراضية)
-                          _ => const SizedBox.shrink(),
-                        };
-                      },
-                    ),
+                        // Load category progress
+                        return BlocBuilder<
+                          CategoryProgressBloc,
+                          CategoryProgressState
+                        >(
+                          builder: (context, progressState) {
+                            // Trigger loading if not loaded yet
+                            if (progressState is CategoryProgressInitial) {
+                              context.read<CategoryProgressBloc>().add(
+                                GetCategoryProgress(categoryId),
+                              );
+                              return const CategoryProgressLoading();
+                            }
 
-                    // الإحصائيات
-                    HomeStatsRow(
-                      materialsCount: 4,
-                      achievementPercent: 39,
-                      testsCount: 9,
-                    ),
-                    SizedBox(height: AppSizes.vmd),
-                    _SearchBar(),
-                    SizedBox(height: AppSizes.vlg),
-                    _SectionHeader(
-                      title: 'موادي التعليمية',
-                      actionLabel: 'عرض الكل',
-                      onActionTap: () {},
-                    ),
-                    SizedBox(height: AppSizes.vsm),
-                  ],
-                ),
+                            if (progressState is CategoryProgressLoading) {
+                              return const CategoryProgressLoading();
+                            }
+
+                            if (progressState is CategoryProgressLoaded) {
+                              return HomeStatsRow(
+                                materialsCount:
+                                    progressState
+                                        .progress
+                                        .specialization
+                                        .totalSubjects,
+                                achievementPercent:
+                                    progressState
+                                        .progress
+                                        .summary
+                                        .overallProgress,
+                                xp: progressState.progress.summary.totalXp,
+                              );
+                            }
+
+                            if (progressState is CategoryProgressFailure) {
+                              return CategoryProgressError(
+                                message: progressState.message,
+                                onRetry: () {
+                                  context.read<CategoryProgressBloc>().add(
+                                    GetCategoryProgress(categoryId),
+                                  );
+                                },
+                              );
+                            }
+
+                            return const SizedBox.shrink();
+                          },
+                        );
+                      }
+
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                  // // ✅ Stats Row with real data
+                  // BlocBuilder<ProfileCubit, ProfileState>(
+                  //   builder: (context, state) {
+                  //     if (state is ProfileLoaded ||
+                  //         state is ProfileUpdateSuccess) {
+                  //       final profile =
+                  //           state is ProfileLoaded
+                  //               ? state.profile
+                  //               : (state as ProfileUpdateSuccess).profile;
+
+                  //       // Get stats from profile or use defaults
+                  //       final totalSubjects =
+                  //           profile.profile?.currentCategory.
+                  //           0;
+                  //       final progress = profile.profile?.progress ?? 0;
+
+                  //       return HomeStatsRow(
+                  //         materialsCount: totalSubjects,
+                  //         achievementPercent: progress.toInt(),
+                  //         testsCount:
+                  //             0, // You can add tests count if available
+                  //       );
+                  //     }
+                  //     return HomeStatsRow(
+                  //       materialsCount: 0,
+                  //       achievementPercent: 0,
+                  //       testsCount: 0,
+                  //     );
+                  //   },
+                  // ),
+                  SizedBox(height: AppSizes.vmd),
+                  HomeSearchBar(),
+                  SizedBox(height: AppSizes.vlg),
+
+                  // ✅ Category Progress Section
+                  _buildCategoryProgressSection(context),
+
+                  SizedBox(height: AppSizes.vsm),
+                ],
               ),
             ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, i) {
-                final c = _courses[i];
-                return Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppSizes.pagePadding,
-                    vertical: AppSizes.vxs,
-                  ),
-                  child: HomeCourseCard(
-                    svgAsset: c.svgAsset,
-                    title: c.title,
-                    subtitle: c.subtitle,
-                    completedLessons: c.completedLessons,
-                    totalLessons: c.totalLessons,
-                    progressPercent: c.progressPercent,
-                    statusLabel: c.statusLabel,
-                    isComplete: c.isComplete,
-                  ),
-                );
-              }, childCount: _courses.length),
-            ),
-            SliverToBoxAdapter(child: SizedBox(height: AppSizes.vlg)),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // ✅ دالة للانتقال إلى صفحة تعديل الملف الشخصي
-  void _navigateToEditProfile(BuildContext context) {
-    final profileCubit = context.read<ProfileCubit>();
-    final state = profileCubit.state;
+  // ✅ Build Category Progress Section
+  Widget _buildCategoryProgressSection(BuildContext context) {
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, state) {
+        if (state is ProfileLoaded || state is ProfileUpdateSuccess) {
+          final profile =
+              state is ProfileLoaded
+                  ? state.profile
+                  : (state as ProfileUpdateSuccess).profile;
 
-    // استخراج البروفايل من الحالة الحالية
-    ProfileEntity? profile;
-    if (state is ProfileLoaded) {
-      profile = state.profile;
-    } else if (state is ProfileUpdateSuccess) {
-      profile = state.profile;
-    }
+          final categoryId = profile.profile?.currentCategory?.id;
 
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder:
-    //         (_) => BlocProvider.value(
-    //           value: profileCubit,
-    //           child: EditProfileScreen(profile: profile),
-    //         ),
-    //   ),
-    // );
-  }
-}
+          // If no category selected, show empty state
+          if (categoryId == null) {
+            return EmptyCategoryProgress();
+          }
 
-// ── واجهة رأس الصفحة عند تحميل البيانات ───────────────────────────────────
+          // Load category progress
+          return BlocBuilder<CategoryProgressBloc, CategoryProgressState>(
+            builder: (context, progressState) {
+              // Trigger loading if not loaded yet
+              if (progressState is CategoryProgressInitial) {
+                context.read<CategoryProgressBloc>().add(
+                  GetCategoryProgress(categoryId),
+                );
+                return const CategoryProgressLoading();
+              }
 
-class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({
-    required this.profile,
-    required this.onSelectSpecialty,
-  });
+              if (progressState is CategoryProgressLoading) {
+                return const CategoryProgressLoading();
+              }
 
-  final ProfileEntity profile;
-  final VoidCallback onSelectSpecialty;
+              if (progressState is CategoryProgressLoaded) {
+                return _CategoryProgressContent(
+                  progress: progressState.progress,
+                  onSeeAll: () {},
+                );
+              }
 
-  @override
-  Widget build(BuildContext context) {
-    final specialty = profile.profile?.currentCategory?.name ?? '—';
-    final hasSpecialization = profile.hasSpecialization;
+              if (progressState is CategoryProgressFailure) {
+                return CategoryProgressError(
+                  message: progressState.message,
+                  onRetry: () {
+                    context.read<CategoryProgressBloc>().add(
+                      GetCategoryProgress(categoryId),
+                    );
+                  },
+                );
+              }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        HomeGreetingHeader(
-          greeting: 'صباح الخير أيها الطالب الساعي !',
-          name: profile.fullName,
-          specialty: specialty,
-        ),
-        // ✅ عرض تنبيه مع زر اختيار تخصص إذا لم يختر المستخدم تخصص
-        if (!hasSpecialization)
-          _NoSpecializationBanner(onSelectSpecialty: onSelectSpecialty),
-        SizedBox(height: AppSizes.vxxxl),
-      ],
+              return const SizedBox.shrink();
+            },
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
     );
   }
 }
 
-// ── واجهة التحميل ───────────────────────────────────────────────────────────
+// ── Category Progress Content ──────────────────────────────────────────────
 
 class _LoadingHeader extends StatelessWidget {
   const _LoadingHeader();
@@ -248,271 +269,292 @@ class _LoadingHeader extends StatelessWidget {
   }
 }
 
-// ── واجهة الخطأ ─────────────────────────────────────────────────────────────
+class _CategoryProgressContent extends StatelessWidget {
+  const _CategoryProgressContent({
+    required this.progress,
+    required this.onSeeAll,
+  });
 
-class _ErrorHeader extends StatelessWidget {
-  const _ErrorHeader({required this.message, required this.onRetry});
+  final CategoryProgressEntity progress;
+  final VoidCallback onSeeAll;
 
-  final String message;
-  final VoidCallback onRetry;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('موادي التعليمية', style: AppTextStyles.titleMedium()),
+        SizedBox(height: AppSizes.vsm),
+
+        ...progress.subjects.map(
+          (subject) => SubjectProgressCard(
+            subject: subject,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) => BlocProvider(
+                        create:
+                            (context) =>
+                                sl<SubjectDetailBloc>()
+                                  ..add(LoadSubjectDetail(subject)),
+                        child: SubjectDetailScreen(
+                          subject: subject,
+                          categoryId: progress.specialization.id,
+                        ),
+                      ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ProgressStat extends StatelessWidget {
+  const ProgressStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        HomeGreetingHeader(
-          greeting: 'مرحباً بك!',
-          name: '...',
-          specialty: '...',
-        ),
-        SizedBox(height: AppSizes.vsm),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSizes.md,
-            vertical: AppSizes.vmd,
-          ),
-          decoration: BoxDecoration(
-            color: context.errorColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-            border: Border.all(
-              color: context.errorColor.withOpacity(0.3),
-              width: 1.w,
+        Row(
+          textDirection: TextDirection.rtl,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              value,
+              style: AppTextStyles.titleMedium(color: context.whiteColor),
             ),
+            SizedBox(width: AppSizes.xs),
+            Icon(icon, color: context.whiteColor.withOpacity(0.8), size: 16.r),
+          ],
+        ),
+        Text(
+          label,
+          style: AppTextStyles.captionRegular(
+            color: context.whiteColor.withOpacity(0.7),
           ),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Icon(
-                Icons.error_outline_rounded,
-                color: context.errorColor,
-                size: 24.r,
-              ),
-              SizedBox(width: AppSizes.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'تعذّر تحميل البيانات',
-                      style: AppTextStyles.bodyBold(color: context.errorColor),
-                      textAlign: TextAlign.end,
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      message,
-                      style: AppTextStyles.captionRegular(
-                        color: context.textSecondaryColor,
-                      ),
-                      textAlign: TextAlign.end,
-                    ),
-                    SizedBox(height: AppSizes.vxs),
-                    TextButton(
-                      onPressed: onRetry,
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        'إعادة المحاولة',
-                        style: AppTextStyles.bodyRegular(
-                          color: context.primaryColor,
+          textAlign: TextAlign.end,
+        ),
+      ],
+    );
+  }
+}
+
+// ── Subject Progress Card ─────────────────────────────────────────────────
+
+class SubjectProgressCard extends StatelessWidget {
+  const SubjectProgressCard({required this.subject, required this.onTap});
+
+  final SubjectProgressEntity subject;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.only(bottom: AppSizes.vxs),
+        padding: EdgeInsets.symmetric(vertical: 10.r, horizontal: 25.5.r),
+        decoration: BoxDecoration(
+          color: context.whiteColor.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+          border: Border.all(color: context.borderColor, width: 1.w),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              spacing: 10.r,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: context.skyBlueColor,
+                    borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+                  ),
+                  padding: EdgeInsets.all(19.r),
+                  child: Icon(Icons.category),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(subject.name, style: AppTextStyles.bodyBold()),
+                      SizedBox(height: AppSizes.vxs),
+                      Text(
+                        '${subject.stats.totalSkills} مهارات${subject.recentActivity == null ? '' : ' | اخر نشاط منذ ' + _getTimeAgo(DateTime.tryParse(subject.recentActivity!.lastAssessmentDate.toString()))}',
+                        style: AppTextStyles.captionRegular(
+                          color: context.textSecondaryColor,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+
+            SizedBox(height: AppSizes.vxs),
+          ],
         ),
-        SizedBox(height: AppSizes.vxxxl),
-      ],
+      ),
     );
   }
 }
 
-// ── Banner لاختيار التخصص مع زر ────────────────────────────────────────────
+String _getTimeAgo(DateTime? date) {
+  if (date == null) return '';
 
-class _NoSpecializationBanner extends StatelessWidget {
-  const _NoSpecializationBanner({required this.onSelectSpecialty});
+  final now = DateTime.now();
+  final difference = now.difference(date);
 
-  final VoidCallback onSelectSpecialty;
+  if (difference.inDays >= 30) {
+    final months = (difference.inDays / 30).floor();
+    return '$months شهر${months > 1 ? 'ان' : ''}';
+  } else if (difference.inDays >= 7) {
+    final weeks = (difference.inDays / 7).floor();
+    return '$weeks اسبوع${weeks > 1 ? 'ان' : ''}';
+  } else if (difference.inDays >= 2) {
+    return '${difference.inDays} ايام';
+  } else if (difference.inDays == 1) {
+    return 'يوم';
+  } else if (difference.inHours >= 2) {
+    return '${difference.inHours} ساعات';
+  } else if (difference.inHours >= 1) {
+    return 'ساعة';
+  } else if (difference.inMinutes >= 2) {
+    return '${difference.inMinutes} دقائق';
+  } else {
+    return 'الان';
+  }
+}
+// ── Loading State ──────────────────────────────────────────────────────────
+
+class CategoryProgressLoading extends StatelessWidget {
+  const CategoryProgressLoading();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSizes.md,
-        vertical: AppSizes.vmd,
-      ),
-      margin: EdgeInsets.only(top: AppSizes.vsm),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            context.errorColor.withOpacity(0.15),
-            context.errorColor.withOpacity(0.05),
-          ],
-          begin: Alignment.topRight,
-          end: Alignment.topLeft,
-        ),
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        border: Border.all(
-          color: context.errorColor.withOpacity(0.3),
-          width: 1.w,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // صف الرمز والنص
-          Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(
-                Icons.school_outlined,
-                color: context.errorColor,
-                size: 28.r,
-              ),
-              Expanded(
-                child: Text(
-                  'لم تختر تخصصك بعد!',
-                  style: AppTextStyles.titleBold(color: context.errorColor),
-                  textAlign: TextAlign.end,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: AppSizes.vxs),
-          Text(
-            'اختر تخصصك المناسب وابدأ رحلة التعلم المثالية لك',
-            style: AppTextStyles.bodyRegular(color: context.textSecondaryColor),
-            textAlign: TextAlign.end,
-          ),
-          SizedBox(height: AppSizes.vmd),
-          // ✅ زر اختيار التخصص
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: onSelectSpecialty,
-              icon: Icon(
-                Icons.arrow_forward_rounded,
-                size: 20.r,
-                color: context.whiteColor,
-              ),
-              label: Text(
-                'اختيار التخصص',
-                style: AppTextStyles.button(color: context.whiteColor),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.primaryColor,
-                foregroundColor: context.whiteColor,
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSizes.md,
-                  vertical: AppSizes.vmd,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                ),
-                elevation: 0,
+      padding: EdgeInsets.symmetric(vertical: AppSizes.vlg),
+      child: Center(
+        child: Column(
+          children: [
+            CircularProgressIndicator(
+              strokeWidth: 2.w,
+              color: context.primaryColor,
+            ),
+            SizedBox(height: AppSizes.vsm),
+            Text(
+              'جاري تحميل التقدم...',
+              style: AppTextStyles.bodyRegular(
+                color: context.textSecondaryColor,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// ── Internal helpers (not exported) ────────────────────────────────────────
+// ── Error State ────────────────────────────────────────────────────────────
 
-class _SearchBar extends StatelessWidget {
+class CategoryProgressError extends StatelessWidget {
+  const CategoryProgressError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 44.h,
-      decoration: BoxDecoration(
-        color: context.cardBackgroundColor,
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        border: Border.all(color: context.borderColor),
-      ),
-      child: Row(
-        textDirection: TextDirection.rtl,
-        children: [
-          SizedBox(width: AppSizes.md),
-          Icon(Icons.search, color: context.textHintColor, size: 20.r),
-          SizedBox(width: AppSizes.sm),
-          Text(
-            'ابحث في المواد ...',
-            style: AppTextStyles.bodyRegular(color: context.textHintColor),
-          ),
-        ],
+      padding: EdgeInsets.symmetric(vertical: AppSizes.vlg),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              color: context.errorColor,
+              size: 40.r,
+            ),
+            SizedBox(height: AppSizes.vsm),
+            Text(
+              'تعذر تحميل التقدم',
+              style: AppTextStyles.bodyBold(color: context.errorColor),
+            ),
+            SizedBox(height: AppSizes.vxs),
+            Text(
+              message,
+              style: AppTextStyles.captionRegular(
+                color: context.textSecondaryColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: AppSizes.vmd),
+            TextButton(
+              onPressed: onRetry,
+              child: Text(
+                'إعادة المحاولة',
+                style: AppTextStyles.bodyRegular(color: context.primaryColor),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    required this.actionLabel,
-    required this.onActionTap,
-  });
+// ── Empty Category Progress ───────────────────────────────────────────────
 
-  final String title;
-  final String actionLabel;
-  final VoidCallback onActionTap;
+class EmptyCategoryProgress extends StatelessWidget {
+  const EmptyCategoryProgress();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      textDirection: TextDirection.rtl,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: AppTextStyles.titleMedium()),
-        GestureDetector(
-          onTap: onActionTap,
-          child: Row(
-            children: [
-              Text(
-                actionLabel,
-                style: AppTextStyles.bodyRegular(color: context.primaryColor),
-              ),
-              Icon(
-                Icons.chevron_right,
-                size: 16.r,
-                color: context.primaryColor,
-              ),
-            ],
-          ),
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: AppSizes.vlg),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(
+              Icons.school_outlined,
+              color: context.textHintColor,
+              size: 48.r,
+            ),
+            SizedBox(height: AppSizes.vsm),
+            Text(
+              'لم تختر تخصصاً بعد',
+              style: AppTextStyles.bodyBold(color: context.textSecondaryColor),
+            ),
+            SizedBox(height: AppSizes.vxs),
+            Text(
+              'اختر تخصصك لترى تقدمك هنا',
+              style: AppTextStyles.captionRegular(color: context.textHintColor),
+            ),
+            SizedBox(height: AppSizes.vmd),
+            ElevatedButton(
+              onPressed: () {
+                context.push(AppRoutes.categories);
+              },
+              child: Text('اختيار التخصص'),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
-}
-
-class _CourseData {
-  const _CourseData({
-    required this.svgAsset,
-    required this.title,
-    required this.subtitle,
-    required this.completedLessons,
-    required this.totalLessons,
-    required this.progressPercent,
-    required this.statusLabel,
-    required this.isComplete,
-  });
-
-  final String svgAsset;
-  final String title;
-  final String subtitle;
-  final int completedLessons;
-  final int totalLessons;
-  final double progressPercent;
-  final String statusLabel;
-  final bool isComplete;
 }

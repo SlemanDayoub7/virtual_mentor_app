@@ -189,14 +189,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       onImageSelected: (f) => setState(() => _avatarFile = f),
                     ),
                   ),
-                  Center(
-                    child: Text(
-                      'تعديل الصورة',
-                      style: AppTextStyles.captionRegular(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
+
                   SizedBox(height: AppSizes.vmd),
 
                   // ── Name row ──────────────────────────────────────────────

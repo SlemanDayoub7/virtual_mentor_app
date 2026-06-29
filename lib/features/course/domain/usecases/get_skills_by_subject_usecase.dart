@@ -1,5 +1,6 @@
 import 'package:virtual_mentor_app/core/networking/api_result.dart';
-import '../entities/skill_entity.dart';
+import 'package:virtual_mentor_app/features/course/domain/entities/skill_entity.dart';
+
 import '../repositories/course_repository.dart';
 
 class GetSkillsBySubjectUseCase {

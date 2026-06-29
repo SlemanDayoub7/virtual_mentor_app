@@ -15,9 +15,6 @@ class DioClient {
     : dio = Dio(
         BaseOptions(
           baseUrl: ApiConstants.baseUrl,
-          // connectTimeout: const Duration(seconds: ApiConstants.connectTimeout),
-          // receiveTimeout: const Duration(seconds: ApiConstants.receiveTimeout),
-          // sendTimeout: const Duration(seconds: ApiConstants.sendTimeout),
           headers: {
             'Content-Type': 'application/json',
             'ngrok-skip-browser-warning': 'true',
@@ -64,29 +61,34 @@ class DioClient {
           final newToken = await SecureStorageHelper.getAccessToken();
           if (newToken == null) return handler.reject(error);
 
-          RequestOptions newOpts;
-
-          if (opts.data is FormData) {
-            final formData = FormData();
-            final oldData = opts.data as FormData;
-            for (final entry in oldData.fields) {
-              formData.fields.add(MapEntry(entry.key, entry.value));
-            }
-            for (final file in oldData.files) {
-              formData.files.add(MapEntry(file.key, file.value));
-            }
-            newOpts = opts.copyWith(data: formData);
-          } else {
-            newOpts = opts;
-          }
+          // FIX: Clone original option configurations cleanly without manual looping
+          final options = Options(
+            method: opts.method,
+            headers:
+                opts.headers
+                  ..['Authorization'] =
+                      'JWT $newToken', // FIX: Unified to "JWT"
+            responseType: opts.responseType,
+            contentType: opts.contentType,
+            validateStatus: opts.validateStatus,
+            receiveTimeout: opts.receiveTimeout,
+            sendTimeout: opts.sendTimeout,
+          );
 
           try {
-            final response = await dio.fetch(
-              newOpts..headers['Authorization'] = 'Bearer $newToken',
+            // FIX: Use dio.request directly instead of dio.fetch to cleanly retry requests
+            final response = await dio.request(
+              opts.path,
+              data: opts.data,
+              queryParameters: opts.queryParameters,
+              options: options,
             );
             return handler.resolve(response);
           } catch (e) {
-            return handler.reject(e as DioException);
+            if (e is DioException) {
+              return handler.reject(e);
+            }
+            return handler.reject(DioException(requestOptions: opts, error: e));
           }
         },
       ),
@@ -98,8 +100,9 @@ class DioClient {
         responseBody: true,
         error: true,
         logPrint: (object) {
-          // Remove comment below to enable logging in debug mode
-          if (kDebugMode) print(object);
+          // ALWAYS active in debug mode; safe to leave as-is
+          // if (kDebugMode)
+          print(object);
         },
       ),
     ]);
@@ -112,10 +115,15 @@ class DioClient {
     if (refreshToken == null) return false;
 
     try {
+      // FIX: Added the mandatory ngrok and json headers to prevent an interstitial 400 landing screen
       final refreshDio = Dio(
         BaseOptions(
           baseUrl: ApiConstants.baseUrl,
           validateStatus: (status) => true,
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+          },
         ),
       );
 
@@ -134,7 +142,6 @@ class DioClient {
           response.statusCode == 401 ||
           response.statusCode == 404) {
         await SecureStorageHelper.clearTokens();
-        // TODO: Trigger SessionBloc expired event here via GetIt
         sl<SessionBloc>().add(SessionExpired());
         return false;
       }

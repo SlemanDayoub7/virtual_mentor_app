@@ -15,6 +15,7 @@ import 'package:virtual_mentor_app/features/course/presentation/screens/categori
 import 'package:virtual_mentor_app/features/course/presentation/screens/skills_screen.dart';
 import 'package:virtual_mentor_app/features/course/presentation/screens/subjects_screen.dart';
 import 'package:virtual_mentor_app/features/main/pages/main_page.dart';
+import 'package:virtual_mentor_app/features/splash/presentation/pages/splash_page.dart';
 import '../../core/bloc/session_bloc/session_bloc.dart';
 
 // ─── Route names ──────────────────────────────────────────────────────────────
@@ -37,7 +38,7 @@ GoRouter createRouter(SessionBloc sessionBloc) {
   return GoRouter(
     initialLocation: AppRoutes.splash,
     refreshListenable: GoRouterRefreshListenable(sessionBloc),
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final session = sessionBloc.state;
       final location = state.matchedLocation;
 
@@ -53,6 +54,7 @@ GoRouter createRouter(SessionBloc sessionBloc) {
 
       // IMPORTANT: معالجة شاشة Splash بشكل خاص
       if (location == AppRoutes.splash) {
+        await Future.delayed(Duration(seconds: 2));
         if (session is SessionAuthenticated) {
           print('✅ Authenticated user on splash -> redirecting to home');
           return AppRoutes.home;
@@ -108,7 +110,7 @@ GoRouter createRouter(SessionBloc sessionBloc) {
       GoRoute(
         path: AppRoutes.splash,
         name: 'splash',
-        builder: (context, state) => const _SplashScreen(),
+        builder: (context, state) => const SplashScreen(),
       ),
 
       // ── Auth routes ───────────────────────────────────────────────────────
@@ -196,37 +198,5 @@ class GoRouterRefreshListenable extends ChangeNotifier {
   void dispose() {
     _subscription.cancel();
     super.dispose();
-  }
-}
-
-// ── Minimal splash — shown only during SessionInitial ─────────────────────────
-class _SplashScreen extends StatefulWidget {
-  const _SplashScreen();
-
-  @override
-  State<_SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<_SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    print('📱 SplashScreen mounted');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 20),
-            Text('Loading...'),
-          ],
-        ),
-      ),
-    );
   }
 }
