@@ -21,7 +21,7 @@ class ApiConstants {
   static const String refreshToken = '/auth/tokens-refresh/';
   static const String skillProfiles = '/api/skill-profiles';
   static const String conceptProfiles = '/api/concept-profiles/';
-
+  static const String progressOverview='/api/progress-overview/';
   // ===== COURSE ENDPOINTS =====
   static const String categories = '/api/categories/';
 
@@ -43,6 +43,9 @@ class ApiConstants {
 
   static String getSkillProfile(int skillProfileId) {
     return '/api/skill-profiles/$skillProfileId/';
+  }
+  static String getProgressOverview(){
+    return '/api/progress-overview/';
   }
 }
 

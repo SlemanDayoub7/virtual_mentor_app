@@ -1,5 +1,6 @@
 import 'package:virtual_mentor_app/core/networking/api_constants.dart';
 import 'package:virtual_mentor_app/core/networking/dio_client.dart';
+import 'package:virtual_mentor_app/features/course/data/models/progress_overview_model.dart';
 import '../models/category_model.dart';
 import '../models/category_progress_model.dart';
 import '../models/skill_profile_model.dart';
@@ -13,6 +14,7 @@ abstract class CourseRemoteDataSource {
 
   // New method for skill profiles
   Future<List<SkillProfileModel>> getSkillProfiles();
+  Future<ProgressOverviewModel> getProgressOverview();
 }
 
 class CourseRemoteDataSourceImpl implements CourseRemoteDataSource {
@@ -70,5 +72,10 @@ class CourseRemoteDataSourceImpl implements CourseRemoteDataSource {
     return data
         .map((json) => SkillProfileModel.fromJson(json as Map<String, dynamic>))
         .toList();
+  }
+  @override
+   Future<ProgressOverviewModel>getProgressOverview() async {
+    final response = await _client.dio.get(ApiConstants.getProgressOverview());
+   return ProgressOverviewModel.fromJson(response.data as Map<String, dynamic>);
   }
 }
