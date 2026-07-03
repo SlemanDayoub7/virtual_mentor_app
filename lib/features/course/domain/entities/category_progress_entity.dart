@@ -1,4 +1,4 @@
-// lib/domain/entities/category_progress_entity.dart
+
 
 class CategoryProgressEntity {
   final SpecializationEntity specialization;
