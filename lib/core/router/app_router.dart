@@ -36,73 +36,73 @@ abstract class AppRoutes {
 // ─── Router ───────────────────────────────────────────────────────────────────
 GoRouter createRouter(SessionBloc sessionBloc) {
   return GoRouter(
-    initialLocation: AppRoutes.splash,
+    initialLocation: AppRoutes.home,
     refreshListenable: GoRouterRefreshListenable(sessionBloc),
     redirect: (context, state) async {
-      final session = sessionBloc.state;
-      final location = state.matchedLocation;
+      // final session = sessionBloc.state;
+      // final location = state.matchedLocation;
 
-      print(
-        'Router redirect - Session state: ${session.runtimeType}, Location: $location',
-      );
+      // print(
+      //   'Router redirect - Session state: ${session.runtimeType}, Location: $location',
+      // );
 
-      // حالة التحميل - ابق على شاشة Splash
-      if (session is SessionInitial) {
-        print('Still on splash screen - waiting for session check');
-        return null;
-      }
+      // // حالة التحميل - ابق على شاشة Splash
+      // if (session is SessionInitial) {
+      //   print('Still on splash screen - waiting for session check');
+      //   return null;
+      // }
 
-      // IMPORTANT: معالجة شاشة Splash بشكل خاص
-      if (location == AppRoutes.splash) {
-        await Future.delayed(Duration(seconds: 2));
-        if (session is SessionAuthenticated) {
-          print('✅ Authenticated user on splash -> redirecting to home');
-          return AppRoutes.home;
-        }
-        if (session is SessionUnauthenticated) {
-          print('❌ Unauthenticated user on splash -> redirecting to login');
-          return AppRoutes.login;
-        }
-      }
+      // // IMPORTANT: معالجة شاشة Splash بشكل خاص
+      // if (location == AppRoutes.splash) {
+      //   await Future.delayed(Duration(seconds: 2));
+      //   if (session is SessionAuthenticated) {
+      //     print('✅ Authenticated user on splash -> redirecting to home');
+      //     return AppRoutes.home;
+      //   }
+      //   if (session is SessionUnauthenticated) {
+      //     print('❌ Unauthenticated user on splash -> redirecting to login');
+      //     return AppRoutes.login;
+      //   }
+      // }
 
-      // للمستخدم غير المسجل الدخول - اذا حاول دخول صفحات protected
-      if (session is SessionUnauthenticated) {
-        // قائمة الصفحات المسموحة للمستخدم غير المسجل
-        const publicRoutes = {
-          AppRoutes.login,
-          AppRoutes.register,
-          AppRoutes.otp,
-          AppRoutes.forgotPassword,
-          AppRoutes.resetPassword,
-        };
+      // // للمستخدم غير المسجل الدخول - اذا حاول دخول صفحات protected
+      // if (session is SessionUnauthenticated) {
+      //   // قائمة الصفحات المسموحة للمستخدم غير المسجل
+      //   const publicRoutes = {
+      //     AppRoutes.login,
+      //     AppRoutes.register,
+      //     AppRoutes.otp,
+      //     AppRoutes.forgotPassword,
+      //     AppRoutes.resetPassword,
+      //   };
 
-        if (!publicRoutes.contains(location)) {
-          print(
-            'Unauthenticated user trying to access $location -> redirecting to login',
-          );
-          return AppRoutes.login;
-        }
-      }
+      //   if (!publicRoutes.contains(location)) {
+      //     print(
+      //       'Unauthenticated user trying to access $location -> redirecting to login',
+      //     );
+      //     return AppRoutes.login;
+      //   }
+      // }
 
-      // للمستخدم المسجل الدخول - اذا حاول دخول صفحات auth
-      if (session is SessionAuthenticated) {
-        const authRoutes = {
-          AppRoutes.login,
-          AppRoutes.register,
-          AppRoutes.otp,
-          AppRoutes.forgotPassword,
-          AppRoutes.resetPassword,
-        };
+      // // للمستخدم المسجل الدخول - اذا حاول دخول صفحات auth
+      // if (session is SessionAuthenticated) {
+      //   const authRoutes = {
+      //     AppRoutes.login,
+      //     AppRoutes.register,
+      //     AppRoutes.otp,
+      //     AppRoutes.forgotPassword,
+      //     AppRoutes.resetPassword,
+      //   };
 
-        if (authRoutes.contains(location)) {
-          print(
-            'Authenticated user trying to access auth page $location -> redirecting to home',
-          );
-          return AppRoutes.home;
-        }
-      }
+      //   if (authRoutes.contains(location)) {
+      //     print(
+      //       'Authenticated user trying to access auth page $location -> redirecting to home',
+      //     );
+      //     return AppRoutes.home;
+      //   }
+      // }
 
-      print('No redirect needed - staying on $location');
+      // print('No redirect needed - staying on $location');
       return null;
     },
     routes: [

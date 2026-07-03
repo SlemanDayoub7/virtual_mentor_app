@@ -19,10 +19,12 @@ class SkillBloc extends Bloc<SkillEvent, SkillState> {
     Emitter<SkillState> emit,
   ) async {
     emit(SkillLoading());
+
     final result = await _getSkillsBySubjectUseCase(
       event.categoryId,
       event.subjectId,
     );
+
     result.when(
       success: (skills) => emit(SkillLoaded(skills)),
       failure: (error) => emit(SkillFailure(error.apiErrorModel.message)),
