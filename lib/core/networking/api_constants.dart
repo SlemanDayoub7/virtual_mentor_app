@@ -19,9 +19,8 @@ class ApiConstants {
   static const String activateAccount = '/api/verify-otp/';
   static const String resendOtp = '/api/resend-otp/';
   static const String refreshToken = '/auth/tokens-refresh/';
-  static const String skillProfiles = '/api/skill-profiles';
-  static const String conceptProfiles = '/api/concept-profiles/';
-  static const String progressOverview='/api/progress-overview/';
+  static const String progressOverview = '/api/progress-overview/';
+
   // ===== COURSE ENDPOINTS =====
   static const String categories = '/api/categories/';
 
@@ -37,15 +36,28 @@ class ApiConstants {
     return '/api/categories/$categoryId/subjects/$subjectId/skills/';
   }
 
-  static String getSkillProfiles() {
-    return '/api/skill-profiles';
+  static String getProgressOverview() {
+    return '/api/progress-overview/';
   }
 
-  static String getSkillProfile(int skillProfileId) {
-    return '/api/skill-profiles/$skillProfileId/';
+  // ===== SKILL PROFILES (subject scoped) =====
+  // Replaces the old flat '/api/skill-profiles' endpoint.
+  static String getSkillProfilesBySubject(int categoryId, int subjectId) {
+    return '/api/categories/$categoryId/subjects/$subjectId/skill-profiles/';
   }
-  static String getProgressOverview(){
-    return '/api/progress-overview/';
+
+  // ===== CONCEPT PROFILES =====
+  static String getConceptProfiles(int categoryId, int subjectId, int skillId) {
+    return '/api/categories/$categoryId/subjects/$subjectId/skills/$skillId/concept-profiles/';
+  }
+
+  // ===== PLACEMENT =====
+  static String startPlacement(int categoryId, int subjectId, int skillId) {
+    return '/api/categories/$categoryId/subjects/$subjectId/skills/$skillId/start-placement/';
+  }
+
+  static String submitPlacement(int placementId) {
+    return '/api/placement/$placementId/submit/';
   }
 }
 
