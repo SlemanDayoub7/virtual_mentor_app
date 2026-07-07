@@ -1,16 +1,16 @@
-import 'package:virtual_mentor_app/features/course/domain/entities/skill_entity.dart';
+import 'skill_brief_entity.dart';
 
 class SkillProfileEntity {
   final int id;
-  final SkillEntity skill;
+  final SkillBriefEntity skill;
   final bool isStarted;
   final String? currentLevel;
-  final double? assessmentScore;
+  final int? assessmentScore;
   final bool? isMastered;
-  final String? masteredAt;
+  final DateTime? masteredAt;
   final int? totalAssessments;
-  final String? lastAssessedAt;
-  final String? canReassessAt;
+  final DateTime? lastAssessedAt;
+  final DateTime? canReassessAt;
   final int? xpTotal;
 
   const SkillProfileEntity({

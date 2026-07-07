@@ -6,6 +6,6 @@ class GetSkillProfilesUseCase {
   final CourseRepository _repository;
   const GetSkillProfilesUseCase(this._repository);
 
-  Future<ApiResult<List<SkillProfileEntity>>> call() =>
-      _repository.getSkillProfiles();
+  Future<ApiResult<List<SkillProfileEntity>>> call() => _repository
+      .getSkillProfilesBySubject(1, 1); // Example categoryId and subject
 }
