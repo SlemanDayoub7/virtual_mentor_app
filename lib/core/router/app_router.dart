@@ -13,6 +13,7 @@ import 'package:virtual_mentor_app/features/course/domain/entities/category_enti
 import 'package:virtual_mentor_app/features/course/domain/entities/subject_entity.dart';
 import 'package:virtual_mentor_app/features/course/presentation/screens/categories_screen.dart';
 import 'package:virtual_mentor_app/features/course/presentation/screens/skills_screen.dart';
+import 'package:virtual_mentor_app/features/course/presentation/screens/statistics_screen.dart';
 import 'package:virtual_mentor_app/features/course/presentation/screens/subjects_screen.dart';
 import 'package:virtual_mentor_app/features/main/pages/main_page.dart';
 import 'package:virtual_mentor_app/features/splash/presentation/pages/splash_page.dart';
@@ -31,6 +32,7 @@ abstract class AppRoutes {
   static const categories = '/categories';
   static const subjects = '/categories/:categoryId/subjects';
   static const skills = '/categories/:categoryId/subjects/:subjectId/skills';
+  static const statistics = '/statistics';
 }
 
 // ─── Router ───────────────────────────────────────────────────────────────────
@@ -52,29 +54,30 @@ GoRouter createRouter(SessionBloc sessionBloc) {
       //   return null;
       // }
 
-      // // IMPORTANT: معالجة شاشة Splash بشكل خاص
-      // if (location == AppRoutes.splash) {
-      //   await Future.delayed(Duration(seconds: 2));
-      //   if (session is SessionAuthenticated) {
-      //     print('✅ Authenticated user on splash -> redirecting to home');
-      //     return AppRoutes.home;
-      //   }
-      //   if (session is SessionUnauthenticated) {
-      //     print('❌ Unauthenticated user on splash -> redirecting to login');
-      //     return AppRoutes.login;
-      //   }
-      // }
+      // IMPORTANT: معالجة شاشة Splash بشكل خاص
+      if (location == AppRoutes.splash) {
+        await Future.delayed(Duration(seconds: 2));
+        if (session is SessionAuthenticated) {
+          print('Authenticated user on splash -> redirecting to home');
+          return AppRoutes.home;
+        }
+        if (session is SessionUnauthenticated) {
+          print('Unauthenticated user on splash -> redirecting to login');
+          return AppRoutes.login;
+        }
+      }
 
-      // // للمستخدم غير المسجل الدخول - اذا حاول دخول صفحات protected
-      // if (session is SessionUnauthenticated) {
-      //   // قائمة الصفحات المسموحة للمستخدم غير المسجل
-      //   const publicRoutes = {
-      //     AppRoutes.login,
-      //     AppRoutes.register,
-      //     AppRoutes.otp,
-      //     AppRoutes.forgotPassword,
-      //     AppRoutes.resetPassword,
-      //   };
+      // للمستخدم غير المسجل الدخول - اذا حاول دخول صفحات protected
+      if (session is SessionUnauthenticated) {
+        // قائمة الصفحات المسموحة للمستخدم غير المسجل
+        const publicRoutes = {
+          AppRoutes.login,
+          AppRoutes.register,
+          AppRoutes.otp,
+          AppRoutes.forgotPassword,
+          AppRoutes.resetPassword,
+          AppRoutes.home,
+        };
 
       //   if (!publicRoutes.contains(location)) {
       //     print(
@@ -178,6 +181,11 @@ GoRouter createRouter(SessionBloc sessionBloc) {
           return SkillsScreen(subject: subject);
         },
       ),
+      GoRoute(
+        path: AppRoutes.statistics,
+        name: 'statistics',
+        builder: (context, state) => const StatisticsScreen(),
+      ),
     ],
   );
 }
@@ -189,7 +197,7 @@ class GoRouterRefreshListenable extends ChangeNotifier {
 
   GoRouterRefreshListenable(this.bloc) {
     _subscription = bloc.stream.listen((_) {
-      print('🔄 Session state changed - notifying router');
+      print('Session state changed - notifying router');
       notifyListeners();
     });
   }

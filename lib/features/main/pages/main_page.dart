@@ -8,6 +8,7 @@ import 'package:virtual_mentor_app/core/extensions/extensions.dart';
 import 'package:virtual_mentor_app/core/theme/app_sizes.dart';
 import 'package:virtual_mentor_app/core/theme/app_text_styles.dart';
 import 'package:virtual_mentor_app/core/utils/app_assets.dart';
+import 'package:virtual_mentor_app/features/course/presentation/screens/statistics_screen.dart';
 import 'package:virtual_mentor_app/features/home/presentation/pages/home_tab.dart';
 import 'package:virtual_mentor_app/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:virtual_mentor_app/features/profile/presentation/pages/profile_tab.dart';
@@ -41,7 +42,7 @@ class _MainPageState extends State<MainPage> {
   // الترتيب: المواد (0) ← الإحصائيات (1) ← ملفي (2)
   static const List<Widget> _pages = [
     HomeTab(), // المواد
-    _PlaceholderTab(label: 'الإحصائيات'), // الإحصائيات
+    StatisticsScreen(), // الإحصائيات
     ProfileTab(), // ملفي
   ];
 

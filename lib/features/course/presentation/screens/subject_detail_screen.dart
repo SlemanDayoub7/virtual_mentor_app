@@ -1036,7 +1036,7 @@ class _SkillProfileCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    _formatDate(profile.lastAssessedAt!),
+                    _formatDate(profile.lastAssessedAt!.toString()),
                     style: AppTextStyles.captionRegular(
                       color: context.textHintColor,
                     ),
@@ -1075,7 +1075,7 @@ class _SkillProfileCard extends StatelessWidget {
                     ),
                     SizedBox(width: AppSizes.xs),
                     Text(
-                      'يمكنك إعادة التقييم ${_formatDate(profile.canReassessAt!)}',
+                      'يمكنك إعادة التقييم ${_formatDate(profile.canReassessAt!.toString())}',
                       style: AppTextStyles.captionRegular(
                         color: context.primaryColor,
                       ),
